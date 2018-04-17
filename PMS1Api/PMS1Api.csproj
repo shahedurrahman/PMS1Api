@@ -12,4 +12,8 @@
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0-preview2-final" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PMS1Api.Models\PMS1Api.Models.csproj" />
+  </ItemGroup>
+
 </Project>
