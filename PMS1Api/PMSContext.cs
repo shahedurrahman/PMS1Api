@@ -10,5 +10,6 @@ namespace PMS1Api
         }
 
         public DbSet<Drug> Drug { get; set; }
+        public DbSet<Order> Order { get; set; }
     }
 }

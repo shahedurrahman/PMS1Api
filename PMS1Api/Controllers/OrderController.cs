@@ -5,40 +5,39 @@ using System.Threading.Tasks;
 
 namespace PMS1Api.Controllers
 {
-    [Route("api/drug")]
-    [Produces("application/json")]
-    public class DrugController : ControllerBase
+    [Route("api/order")]
+    public class OrderController : ControllerBase
     {
         private readonly PMSContext _context;
 
-        public DrugController(PMSContext context)
+        public OrderController(PMSContext context)
         {
             _context = context;
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody]Drug model)
+        public async Task<IActionResult> Create([FromBody]Order model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _context.Drug.AddAsync(model);
+            await _context.Order.AddAsync(model);
             await _context.SaveChangesAsync();
 
-            return CreatedAtRoute("GetDrugById", new { id = model.DrugId }, model);
+            return CreatedAtRoute("GetOrderById", new { id = model.OrderId }, model);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> Update([FromBody]Drug model)
+        public async Task<IActionResult> Update([FromBody]Order model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var existingDrug = await _context.Drug.SingleOrDefaultAsync(x => x.DrugId == model.DrugId);
-            if (existingDrug == null)
+            var existingOrder = await _context.Order.SingleOrDefaultAsync(x=>x.OrderId == model.OrderId);
+            if (existingOrder == null)
                 return NotFound();
 
-            _context.Entry(existingDrug).CurrentValues.SetValues(model);
+            _context.Entry(existingOrder).CurrentValues.SetValues(model);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -47,14 +46,14 @@ namespace PMS1Api.Controllers
         [HttpGet("getall")]
         public async Task<IActionResult> GetAll()
         {
-            var list = await _context.Drug.ToListAsync();
+            var list = await _context.Order.ToListAsync();
             return Ok(list);
         }
 
-        [HttpGet("get/{id}", Name = "GetDrugById")]
+        [HttpGet("get/{id}", Name = "GetOrderById")]
         public async Task<IActionResult> Get(int id)
         {
-            var item = await _context.Drug.FirstOrDefaultAsync(x => x.DrugId == id);
+            var item = await _context.Order.SingleOrDefaultAsync(x => x.OrderId == id);
             if (item == null)
                 return NotFound();
 
