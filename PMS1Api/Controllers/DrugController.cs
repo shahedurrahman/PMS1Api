@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PMS1Api.Models.EFModels;
 using System.Threading.Tasks;
 
@@ -10,10 +11,12 @@ namespace PMS1Api.Controllers
     public class DrugController : ControllerBase
     {
         private readonly PMSContext _context;
+        private readonly ILogger<DrugController> _logger;
 
-        public DrugController(PMSContext context)
+        public DrugController(PMSContext context, ILogger<DrugController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost("create")]

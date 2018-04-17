@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PMS1Api.Models.EFModels;
 using System.Threading.Tasks;
 
@@ -9,10 +10,12 @@ namespace PMS1Api.Controllers
     public class OrderController : ControllerBase
     {
         private readonly PMSContext _context;
+        private readonly ILogger<OrderController> _logger;
 
-        public OrderController(PMSContext context)
+        public OrderController(PMSContext context, ILogger<OrderController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost("create")]
