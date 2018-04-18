@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PMS1Api.Models.ApiModels;
 using PMS1Api.Models.EFModels;
 using System.Threading.Tasks;
 
@@ -11,28 +13,32 @@ namespace PMS1Api.Controllers
     public class DrugController : ControllerBase
     {
         private readonly PMSContext _context;
+        private readonly IMapper _mapper;
         private readonly ILogger<DrugController> _logger;
 
-        public DrugController(PMSContext context, ILogger<DrugController> logger)
+        public DrugController(PMSContext context, IMapper mapper, ILogger<DrugController> logger)
         {
             _context = context;
+            _mapper = mapper;
             _logger = logger;
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody]Drug model)
+        public async Task<IActionResult> Create([FromBody]DrugCreateRequest model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _context.Drug.AddAsync(model);
+            var drug = _mapper.Map<Drug>(model);
+
+            await _context.Drug.AddAsync(drug);
             await _context.SaveChangesAsync();
 
-            return CreatedAtRoute("GetDrugById", new { id = model.DrugId }, model);
+            return CreatedAtRoute("GetDrugById", new { id = drug.DrugId }, drug);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> Update([FromBody]Drug model)
+        public async Task<IActionResult> Update([FromBody]DrugUpdateRequest model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -41,7 +47,9 @@ namespace PMS1Api.Controllers
             if (existingDrug == null)
                 return NotFound();
 
-            _context.Entry(existingDrug).CurrentValues.SetValues(model);
+            var drug = _mapper.Map<Drug>(model);
+
+            _context.Entry(existingDrug).CurrentValues.SetValues(drug);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -57,11 +65,13 @@ namespace PMS1Api.Controllers
         [HttpGet("get/{id}", Name = "GetDrugById")]
         public async Task<IActionResult> Get(int id)
         {
-            var item = await _context.Drug.FirstOrDefaultAsync(x => x.DrugId == id);
+            var item = await _context.Drug.SingleOrDefaultAsync(x => x.DrugId == id);
             if (item == null)
                 return NotFound();
 
-            return Ok(item);
+            var drug = _mapper.Map<DrugGetResponse>(item);
+
+            return Ok(drug);
         }
     }
 }

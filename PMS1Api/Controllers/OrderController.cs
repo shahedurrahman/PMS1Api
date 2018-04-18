@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PMS1Api.Models.ApiModels;
 using PMS1Api.Models.EFModels;
 using System.Threading.Tasks;
 
@@ -10,28 +12,32 @@ namespace PMS1Api.Controllers
     public class OrderController : ControllerBase
     {
         private readonly PMSContext _context;
+        private readonly IMapper _mapper;
         private readonly ILogger<OrderController> _logger;
 
-        public OrderController(PMSContext context, ILogger<OrderController> logger)
+        public OrderController(PMSContext context, IMapper mapper, ILogger<OrderController> logger)
         {
             _context = context;
+            _mapper = mapper;
             _logger = logger;
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody]Order model)
+        public async Task<IActionResult> Create([FromBody]OrderCreateRequest model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _context.Order.AddAsync(model);
+            var order = _mapper.Map<Order>(model);
+
+            await _context.Order.AddAsync(order);
             await _context.SaveChangesAsync();
 
-            return CreatedAtRoute("GetOrderById", new { id = model.OrderId }, model);
+            return CreatedAtRoute("GetOrderById", new { id = order.OrderId }, order);
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> Update([FromBody]Order model)
+        public async Task<IActionResult> Update([FromBody]OrderUpdateRequest model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -40,7 +46,9 @@ namespace PMS1Api.Controllers
             if (existingOrder == null)
                 return NotFound();
 
-            _context.Entry(existingOrder).CurrentValues.SetValues(model);
+            var order = _mapper.Map<Order>(model);
+
+            _context.Entry(existingOrder).CurrentValues.SetValues(order);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -60,7 +68,9 @@ namespace PMS1Api.Controllers
             if (item == null)
                 return NotFound();
 
-            return Ok(item);
+            var order = _mapper.Map<OrderGetResponse>(item);
+
+            return Ok(order);
         }
     }
 }
