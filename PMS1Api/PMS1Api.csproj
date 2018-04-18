@@ -2,9 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Properties\PublishProfiles\AdvancedSettings.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
